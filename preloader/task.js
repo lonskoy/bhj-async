@@ -25,8 +25,7 @@ function moneyObj(arr) {
 xhr.open("GET", 'https://students.netoservices.ru/nestjs-backend/slow-get-courses');
 xhr.send();
 xhr.addEventListener('readystatechange', () => { 
-
-    if(xhr.readyState = 4) {
+    if(xhr.readyState === 4) {
         svgIcon.classList.remove('loader_active');
 
         let tempRequest = JSON.parse(xhr.responseText);
