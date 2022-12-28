@@ -1,25 +1,32 @@
 const xhr = new XMLHttpRequest();
 const item = document.querySelector('.item');
+const items = document.getElementById('items');
 const svgIcon = document.getElementById('loader');
+let arr = null;
+const arrObj = [];
 
-function moneyObj(arr) {
+function moneyObj(elem) {
+
+    let valuteObj = document.createElement('div');
+    valuteObj.classList.add('item');
 
     let valuteObj__Code = document.createElement('div');
     valuteObj__Code.classList.add('item__code');
-    valuteObj__Code.textContent = arr.USD.CharCode;
+    valuteObj__Code.textContent = elem.CharCode;
 
     let valuteObj__Value = document.createElement('div');
     valuteObj__Value.classList.add('item__value');
-    valuteObj__Value.textContent = arr.USD.Value;
+    valuteObj__Value.textContent = elem.Value;
 
     let valuteObj__Currency = document.createElement('div');
     valuteObj__Currency.classList.add('item__currency');
     valuteObj__Currency.textContent = 'руб.';
 
-    item.appendChild(valuteObj__Code);
-    item.appendChild(valuteObj__Value);
-    item.appendChild( valuteObj__Currency);
+    valuteObj.appendChild(valuteObj__Code);
+    valuteObj.appendChild(valuteObj__Value);
+    valuteObj.appendChild(valuteObj__Currency);
 
+    items.appendChild(valuteObj);
 }
 
 xhr.open("GET", 'https://students.netoservices.ru/nestjs-backend/slow-get-courses');
@@ -29,8 +36,12 @@ xhr.addEventListener('readystatechange', () => {
         svgIcon.classList.remove('loader_active');
 
         let tempRequest = JSON.parse(xhr.responseText);
-        let arr = tempRequest.response.Valute;
-        moneyObj(arr);
+        arr = tempRequest.response.Valute;
+        for(key in arr) {
+            arrObj.push(arr[key]);
+        }
+
+        arrObj.forEach(elem => moneyObj(elem));
     }
 
 } );
