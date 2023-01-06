@@ -5,6 +5,8 @@ let tempResp = null; // ответ от сервера
 let respAnswers = []; // Массив вариантов ответа
 let respTitle = null; // Заголовок вопроса
 let respId = null; // Id вопроса 
+let staticResp = {}; //Сюда получаем результат со статистикой ответов
+const poll__box = document.querySelector('.poll');
 
 let buttons = null;
 let clickButtonId = null;
@@ -12,6 +14,19 @@ let clickButtonId = null;
 
 xhr.open('GET', 'https://students.netoservices.ru/nestjs-backend/poll');
 xhr.send();
+
+function static () {               //Добавляет результаты статистики в окно popUp
+    const popUp__title = document.querySelector('.popUp__title');
+    const popUp__statics = document.getElementById('popUP__statics');
+    popUp__title.textContent = respTitle;
+
+    for(let i = 0; i < staticResp.length; i++) {
+        let answer = document.createElement('div');
+        answer.classList.add('answer');
+        answer.textContent = `${staticResp.stat[i].answer} : ${staticResp.stat[i].votes}`;
+        popUp__statics.appendChild(answer);
+    }
+}
 
 function work (answers, title) {
     poll__title.textContent = title;
@@ -22,33 +37,34 @@ function work (answers, title) {
         button.setAttribute('id', 'poll__answer');
         button.setAttribute('idAnswer', respId);
         button.setAttribute('idButton', i);   //Получаем значение индекса ответа
+        button.addEventListener('click', (e)=>{
+            console.log('Клик');
+            const xhr2 = new XMLHttpRequest();
+            console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
+
+            xhr2.open('POST', 'https://students.netoservices.ru/nestjs-backend/poll');
+            console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
+
+            xhr2.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' );
+            console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
+
+            let x = e.target; // Получаем ссылку на кликнутую кнопку
+            let y = x.getAttribute('idButton');
+
+            xhr2.send(`vote=${respId}&answer=${y}`); // Отправляем данные на сервер
+            alert('Спасибо, Ваш ответ засчитан');
+            xhr2.addEventListener('load', ()=> {
+                staticResp = JSON.parse(xhr2.responseText);
+                console.log(staticResp);
+                document.querySelector('.popUp').style.display = 'block';
+                static(staticResp);
+            });  
+        });
+
         button.textContent = answers[i];
 
         poll__answers.appendChild(button);
     }
-}
-
-function allButtons() {
-    buttons = document.getElementById('poll__answer');
-    buttons.addEventListener('click', (e)=> {
-        console.log('Клик');
-        const xhr2 = new XMLHttpRequest();
-        console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
-
-        xhr2.open('GET', 'https://students.netoservices.ru/nestjs-backend/poll');
-        console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
-
-        xhr2.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' );
-        console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
-
-        let x = e.target; // Получаем ссылку на кликнутую кнопку
-        let y = x.getAttribute('idButton');
-
-        xhr2.send( 'vote=respId&answer=y' ); //Как вписать переменные в этот запрос?
-
-        console.log('Статус запроса:  ' + xhr2.status + xhr2.statusText);
-        console.log(xhr2.responseText);
-    });
 }
 
 xhr.addEventListener('load', ()=> {
@@ -60,7 +76,6 @@ xhr.addEventListener('load', ()=> {
         respId = tempResp.id;
         console.log(respTitle + '__'+ respAnswers);
         work(respAnswers, respTitle);
-        allButtons();
     }
 });
 

@@ -13,3 +13,14 @@ body {
 .poll__answer {
   margin-right: 5px;
 }
+
+.popUp {
+  display: none;
+  position: absolute;
+  left: calc(50% - 125px);
+  top: 300px;
+  width: 250px;
+  height: 250px;
+  background-color: bisque;
+  border: 1px black dotted;
+}
